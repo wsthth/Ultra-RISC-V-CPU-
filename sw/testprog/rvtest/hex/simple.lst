@@ -1,0 +1,5 @@
+ADDR      MACHINE    ASM
+00000000  00100193  addi x3,x0,1
+00000004  0080006F  j test_end
+00000008  0040006F  j test_end
+0000000C  0000006F  j test_end

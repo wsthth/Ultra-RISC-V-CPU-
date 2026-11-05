@@ -1,0 +1,44 @@
+# Vivado 生成文件
+*.jou
+*.log
+*.str
+*.wdb
+*.wcfg
+*.bak
+*.html
+*.xml
+*.rpt
+*.dcp
+*.bit
+*.ltx
+*.mmi
+*.xpr
+.cache/
+.hw/
+.ip_user_files/
+.sim/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.Xil/
+
+# 仿真输出
+sim/*.wlf
+sim/*.vcd
+sim/*.vpd
+xsim.dir/
+*.pb
+*.journal
+
+# 临时文件
+*~
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# 工具链（太大，不进git）
+sw/bench/toolchain/
+sw/bench/coremark/coremark-main/
+*.zip
