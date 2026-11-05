@@ -174,8 +174,11 @@ module riscv_ooo #(
     );
 
     // ==================== ALU ====================
+    // 修正：I-type指令第二操作数用立即数
+    wire [31:0] alu_op2 = is_itype ? imm_i : issue_op2;
+
     alu u_alu (
-        .a(issue_op1), .b(issue_op2),
+        .a(issue_op1), .b(alu_op2),
         .alucontrol(issue_alu_op),
         .result(alu_result), .zero()
     );
