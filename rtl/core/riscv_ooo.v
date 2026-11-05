@@ -138,6 +138,9 @@ module riscv_ooo #(
     );
 
     // ==================== PRF ====================
+    // 修正：I-type指令的第二个操作数是立即数，不是PRF
+    wire [31:0] rs_op2 = is_itype ? imm_i : prf_rdata2;
+
     prf u_prf (
         .clk(clk),
         .raddr1_i(ps1), .rdata1_o(prf_rdata1),

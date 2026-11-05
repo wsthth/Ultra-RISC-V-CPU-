@@ -43,10 +43,8 @@ module tb_ooo_simple;
             @(posedge clk);
             cycles = cycles + 1;
             if (cycles < 15 || cycles % 5 == 0) begin
-                $display("cycle %0d: pc=%08X reg_wr=%b dispatch=%b rename_ready=%b rob_ready=%b rs_ready=%b pd=%0d commit=%b",
-                         cycles, pc, debug_reg_write_id, debug_dispatch_en,
-                         debug_rename_ready, debug_rob_ready, debug_rs_ready,
-                         debug_pd, commit_valid);
+                $display("cycle %0d: pc=%08X dispatch=%b commit=%b commit_result=%0d",
+                         cycles, pc, debug_dispatch_en, commit_valid, commit_result);
             end
         end
 
