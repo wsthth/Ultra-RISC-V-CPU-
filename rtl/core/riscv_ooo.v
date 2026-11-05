@@ -11,7 +11,14 @@ module riscv_ooo #(
     input  wire        rst_n,
     output wire [31:0] pc_o,
     output wire        commit_valid_o,
-    output wire [31:0] commit_rd_o
+    output wire [31:0] commit_rd_o,
+    // 调试信号
+    output wire        debug_rename_ready,
+    output wire        debug_rob_ready,
+    output wire        debug_rs_ready,
+    output wire        debug_dispatch_en,
+    output wire [6:0] debug_pd,
+    output wire        debug_reg_write_id
 );
 
     // ==================== 内部信号声明 ====================
@@ -184,5 +191,13 @@ module riscv_ooo #(
 
     assign commit_rd_o = commit_result;
     assign commit_valid_o = rob_commit_valid;
+
+    // 调试信号
+    assign debug_rename_ready = rename_ready;
+    assign debug_rob_ready = rob_ready;
+    assign debug_rs_ready = rs_ready;
+    assign debug_dispatch_en = dispatch_en;
+    assign debug_pd = pd;
+    assign debug_reg_write_id = reg_write_id;
 
 endmodule

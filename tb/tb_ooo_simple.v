@@ -8,6 +8,8 @@ module tb_ooo_simple;
     wire [31:0] pc;
     wire        commit_valid;
     wire [31:0] commit_result;
+    wire        debug_rename_ready, debug_rob_ready, debug_rs_ready, debug_dispatch_en, debug_reg_write_id;
+    wire [6:0]  debug_pd;
 
     integer cycles = 0;
 
@@ -21,7 +23,13 @@ module tb_ooo_simple;
         .clk(clk), .rst_n(rst_n),
         .pc_o(pc),
         .commit_valid_o(commit_valid),
-        .commit_rd_o(commit_result)
+        .commit_rd_o(commit_result),
+        .debug_rename_ready(debug_rename_ready),
+        .debug_rob_ready(debug_rob_ready),
+        .debug_rs_ready(debug_rs_ready),
+        .debug_dispatch_en(debug_dispatch_en),
+        .debug_pd(debug_pd),
+        .debug_reg_write_id(debug_reg_write_id)
     );
 
     always #5 clk = ~clk;
@@ -31,12 +39,14 @@ module tb_ooo_simple;
         rst_n = 1;
         $display("Reset released, starting...");
 
-        repeat (100) begin
+        repeat (50) begin
             @(posedge clk);
             cycles = cycles + 1;
-            if (cycles < 20 || cycles % 10 == 0) begin
-                $display("cycle %0d: pc=%08X commit_valid=%b commit_result=%08X",
-                         cycles, pc, commit_valid, commit_result);
+            if (cycles < 15 || cycles % 5 == 0) begin
+                $display("cycle %0d: pc=%08X reg_wr=%b dispatch=%b rename_ready=%b rob_ready=%b rs_ready=%b pd=%0d commit=%b",
+                         cycles, pc, debug_reg_write_id, debug_dispatch_en,
+                         debug_rename_ready, debug_rob_ready, debug_rs_ready,
+                         debug_pd, commit_valid);
             end
         end
 
