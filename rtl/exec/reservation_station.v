@@ -83,9 +83,9 @@ module reservation_station #(
                 // 简化：这里先假设op1/op2都从PRF读，实际会在顶层拼接
                 rs_vj[rs_idx_o] <= prf_rdata1_i;
                 rs_vk[rs_idx_o] <= prf_rdata2_i;
-                // 如果PRF号是0（x0），操作数就绪
-                rs_qj[rs_idx_o] <= (op1_prf_i == 7'd0) ? 7'd0 : op1_prf_i;
-                rs_qk[rs_idx_o] <= (op2_prf_i == 7'd0) ? 7'd0 : op2_prf_i;
+                // 操作数就绪判断：简化版，先全部标记就绪，后续补PRF初始化
+                rs_qj[rs_idx_o] <= 7'd0;
+                rs_qk[rs_idx_o] <= 7'd0;
                 free_count <= free_count - 1;
             end
 
