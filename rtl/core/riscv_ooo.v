@@ -75,11 +75,21 @@ module riscv_ooo #(
     assign rs2_idx = inst_f[24:20];
     assign rd_idx  = inst_f[11:7];
 
-    assign reg_write_id = (opcode == 7'b0110011);
-    assign alu_op_id = (funct3 == 3'b000) ? (funct7[5] ? 4'b0001 : 4'b0000) :
-                       (funct3 == 3'b111) ? 4'b0010 :
-                       (funct3 == 3'b110) ? 4'b0011 :
-                       (funct3 == 3'b100) ? 4'b0100 : 4'b0000;
+    // 支持R-type (0110011) 和 I-type ALU (0010011)
+    wire is_rtype = (opcode == 7'b0110011);
+    wire is_itype = (opcode == 7'b0010011);
+    assign reg_write_id = is_rtype | is_itype;
+
+    // I-type立即数
+    wire [31:0] imm_i = {{20{inst_f[31]}}, inst_f[31:20]};
+    wire [31:0] op2 = is_itype ? imm_i : 32'd0;  // I-type用立即数
+
+    assign alu_op_id = is_rtype ?
+                        ((funct3 == 3'b000) ? (funct7[5] ? 4'b0001 : 4'b0000) :
+                         (funct3 == 3'b111) ? 4'b0010 :
+                         (funct3 == 3'b110) ? 4'b0011 :
+                         (funct3 == 3'b100) ? 4'b0100 : 4'b0000)
+                      : 4'b0000;  // I-type默认ADD
 
     wire dispatch_en = reg_write_id & rename_ready & rob_ready & rs_ready;
 
