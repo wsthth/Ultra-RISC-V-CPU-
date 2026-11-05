@@ -14,12 +14,14 @@ module reservation_station #(
 
     // ---- 发射：分配一个RS项 ----
     input  wire                  dispatch_en_i,
-    input  wire [3:0]            alu_op_i,     // ALU操作
-    input  wire [6:0]            op1_prf_i,     // 源操作数1物理寄存器号
-    input  wire [6:0]            op2_prf_i,    // 源操作数2物理寄存器号
-    input  wire [4:0]            rob_idx_i,      // 对应的ROB索引
-    output wire [3:0]            rs_idx_o,       // 分配到的RS编号
-    output wire                  rs_full_o,     // RS是否满
+    input  wire [3:0]            alu_op_i,
+    input  wire [6:0]            op1_prf_i,
+    input  wire [6:0]            op2_prf_i,
+    input  wire [31:0]           imm_i,
+    input  wire                  use_imm_i,
+    input  wire [4:0]            rob_idx_i,
+    output wire [3:0]            rs_idx_o,
+    output wire                  rs_full_o,
 
     // ---- 物理寄存器堆读口（操作数就绪时直接取） ----
     input  wire [31:0]           prf_rdata1_i,
@@ -42,8 +44,10 @@ module reservation_station #(
     // RS项存储
     reg                 rs_valid [0:RS_DEPTH-1];
     reg [3:0]           rs_op    [0:RS_DEPTH-1];
-    reg [31:0]          rs_vj    [0:RS_DEPTH-1];  // 操作数1的值
-    reg [31:0]          rs_vk    [0:RS_DEPTH-1];  // 操作数2的值
+    reg [31:0]          rs_vj    [0:RS_DEPTH-1];
+    reg [31:0]          rs_vk    [0:RS_DEPTH-1];
+    reg [31:0]          rs_imm   [0:RS_DEPTH-1];
+    reg                 rs_use_imm [0:RS_DEPTH-1];
     reg [6:0]           rs_qj    [0:RS_DEPTH-1];  // 操作数1等待的PRF号（0表示就绪）
     reg [6:0]           rs_qk    [0:RS_DEPTH-1];  // 操作数2等待的PRF号
     reg [4:0]           rs_rob   [0:RS_DEPTH-1];  // ROB索引
@@ -83,6 +87,8 @@ module reservation_station #(
                 // 简化：这里先假设op1/op2都从PRF读，实际会在顶层拼接
                 rs_vj[rs_idx_o] <= prf_rdata1_i;
                 rs_vk[rs_idx_o] <= prf_rdata2_i;
+                rs_imm[rs_idx_o] <= imm_i;
+                rs_use_imm[rs_idx_o] <= use_imm_i;
                 // 操作数就绪判断：简化版，先全部标记就绪，后续补PRF初始化
                 rs_qj[rs_idx_o] <= 7'd0;
                 rs_qk[rs_idx_o] <= 7'd0;
@@ -110,7 +116,7 @@ module reservation_station #(
                     issue_valid_o  <= 1'b1;
                     issue_alu_op_o <= rs_op[i];
                     issue_op1_o    <= rs_vj[i];
-                    issue_op2_o    <= rs_vk[i];
+                    issue_op2_o    <= rs_use_imm[i] ? rs_imm[i] : rs_vk[i];
                     issue_rob_idx_o <= rs_rob[i];
                     rs_valid[i]    <= 1'b0;
                     // 回收RS项
